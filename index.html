@@ -3,90 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shu's Portfolio</title>
+    <title>All The Best</title>
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
+        body { 
+            background: #000; 
+            color: #fff; 
+            font-family: monospace; 
+            display: flex; 
             flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 1rem 0;
-        }
-
-        h1 {
+            align-items: center; 
+            padding-top: 50px;
             margin: 0;
         }
 
-        main {
-            flex-grow: 1;
-            padding: 2rem;
+        h1 { cursor: pointer; font-size: 1.2rem; letter-spacing: 2px; color: #444; }
+        h1:hover { color: #fff; }
+
+        /* The List */
+        ul { 
+            list-style: none; 
+            padding: 0; 
+            width: 300px; 
+        }
+
+        li { 
+            padding: 15px 10px; 
+            border-bottom: 1px solid #222; 
+            cursor: pointer; 
+            transition: 0.2s;
             display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        .container {
-            text-align: center;
+        li:hover { 
+            background: #111; 
+            color: #ffffff; 
         }
 
-        .project {
-            margin-bottom: 2rem;
+        li::before { content: "> "; color: #444; margin-right: 10px; }
+
+        /* Popup Overlay */
+        #overlay { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.98); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 100;
         }
 
-        a {
-            color: #007bff;
-            text-decoration: none;
+        .popup { 
+            width: 90%; 
+            max-width: 700px; 
+            border: 1px solid #333; 
+            padding: 20px; 
+            background: #000;
         }
 
-        footer {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 1rem 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+        pre { 
+            color: #ffffff; 
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+            font-size: 14px;
+            max-height: 70vh;
+            overflow-y: auto;
         }
+
+        .close { 
+            color: #666; 
+            cursor: pointer; 
+            float: right; 
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .close:hover { color: #fff; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Shu's Portfolio</h1>
-    </header>
+    <h1 onclick="hide()">IIOT Codes</h1>
 
-    <main>
-        <div class="container">
-            <h2>Projects</h2>
-            <div class="project">
-                <h3>Project 1: [Project Name]</h3>
-                <p>A brief description of Project 1.</p>
-                <a href="[Link to Project 1]">View Project 1</a>
-            </div>
-            <div class="project">
-                <h3>Project 2: [Project Name]</h3>
-                <p>A brief description of Project 2.</p>
-                <a href="[Link to Project 2]">View Project 2</a>
-            </div>
-            <div class="project">
-                <h3>Project 3: [Project Name]</h3>
-                <p>A brief description of Project 3.</p>
-                <a href="[Link to Project 3]">View Project 3</a>
-            </div>
+    <ul>
+        <li onclick="view(1)">Gas Sensor</li>
+        <li onclick="view(2)">Buzzer</li>
+        <li onclick="view(3)">Motor</li>
+        <li onclick="view(4)">Ultrasonic Sensor</li>
+        <li onclick="view(5)">Temperature</li>
+        <li onclick="view(6)">Soil moisture</li>
+        <li onclick="view(7)">IR Remote</li>
+        <li onclick="view(8)">Relay</li>
+    </ul>
+
+    <div id="overlay" onclick="hide()">
+        <div class="popup" onclick="event.stopPropagation()">
+            <span class="close" onclick="hide()">[ CLOSE_X ]</span>
+            <pre id="display"></pre>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <p>&copy; 2023 Shu</p>
-    </footer>
+    <script>
+        // Note the backticks ( ` ) used for multiline strings
+        const snippets = {
+            1: `#include <LiquidCrystal.h>
+LiquidCrystal lcd(5,6,8,9,10,11);
+  
+int redled = 2;
+int greenled = 3;
+int buzzer = 4;
+int sensor = A0;
+int sensorThresh = 400;
 
+void setup() {
+  pinMode(redled, OUTPUT);
+  pinMode(greenled,OUTPUT);
+  pinMode(buzzer,OUTPUT);
+  pinMode(sensor,INPUT);
+  Serial.begin(9600);
+  lcd.begin(16,2);
+}
+
+void loop() {
+  int analogValue = analogRead(sensor);
+  Serial.print(analogValue);
+  if(analogValue > sensorThresh) {
+    digitalWrite(redled,HIGH);
+    digitalWrite(greenled,LOW);
+    tone(buzzer,1000,10000);
+    lcd.clear();
+    lcd.setCursor(0,1);
+    lcd.print("ALERT");
+    delay(1000);
+  } else {
+    digitalWrite(greenled,HIGH);
+    digitalWrite(redled,LOW);
+    noTone(buzzer);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("SAFE");
+    delay(1000);
+  }`,
+            2: `int buzzer = 8;
+void setup(){
+  pinMode(buzzer,OUTPUT);
+}
+void loop(){
+  tone(buzzer,1000);
+  delay(1000);
+  noTone(buzzer);
+  delay(1000);
+}`,
+            3: `//
+void setup()
+{
+  pinMode(5, OUTPUT);
+  pinMode(4, OUTPUT);
+}
+
+void loop()
+{
+  digitalWrite(5, HIGH);
+  digitalWrite(4, LOW);
+  delay(2000); // Wait for 2000 millisecond(s)
+  digitalWrite(5, LOW);
+  digitalWrite(4, HIGH);
+  delay(2000); // Wait for 2000 millisecond(s)
+}`,
+            4: `int trigPin = 10;
+int echoPin = 9;
+long time;
+int distance;
+
+void setup()
+{
+  pinMode(10, OUTPUT);
+  pinMode(9, INPUT);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  digitalWrite(10, LOW);
+  delayMicroseconds(2);
+  
+  digitalWrite(10, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(10, LOW);
+  
+  time = pulseIn(9, HIGH);
+  distance = time * 0.034 / 2;
+  
+  Serial.print("Distance: ");
+  Serial.println(distance);
+}`,
+            5: `int tempPin = A0;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = analogRead(tempPin);
+
+  float voltage = sensorValue * (5.0 / 1023.0);
+
+  float temperatureC = (voltage - 0.5) * 100;
+
+  Serial.print("Temperature: ");
+  Serial.print(temperatureC);
+  Serial.println(" °C");
+
+  delay(1000);
+}`,
+            6: `void setup() {
+  Serial.begin(9600);
+}
+
+
+void loop() 
+{
+  int a;
+  int b;
+  a = analogRead(A0);
+  b = map(a,0,1023,0,255);
+  Serial.println(b);
+  delay(500);
+  if(b<20 && b>0) {
+    Serial.println("10% humidity");
+  }
+  if(b>87 && b<90){
+    Serial.println("50% humidity");
+  }
+}`,
+            7: `#include <IRremote.hpp>
+
+const int recvPin = 2;   // IR receiver pin
+const int redLED = 7;
+const int greenLED = 6;
+
+void setup() {
+  Serial.begin(9600);
+
+  IrReceiver.begin(recvPin, ENABLE_LED_FEEDBACK);
+
+  pinMode(redLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+}
+
+void loop() {
+  if (IrReceiver.decode()) {
+
+    unsigned long value = IrReceiver.decodedIRData.decodedRawData;
+    Serial.println(value);
+
+    switch (value) {
+
+      case 4010852096:   // Button 1
+        Serial.println("1");
+        digitalWrite(redLED, LOW);
+        break;
+
+      case 3994140416:   // Button 2
+        Serial.println("2");
+        digitalWrite(redLED, HIGH);
+        break;
+
+      case 3977428736:   // Button 3
+        Serial.println("3");
+        digitalWrite(greenLED, LOW);
+        break;
+
+      case 3944005376:   // Button 4
+        Serial.println("4");
+        digitalWrite(greenLED, HIGH);
+        break;
+    }
+
+    IrReceiver.resume(); // Ready for next signal
+  }
+}`,
+            8: `int relayPin = 4;
+
+void setup(){
+  pinMode(relayPin,OUTPUT);
+}
+
+void loop(){
+  digitalWrite(relayPin,HIGH);
+  delay(1000);
+  digitalWrite(relayPin,LOW);
+  delay(1000);
+}`
+        };
+
+        const view = (id) => {
+            document.getElementById('display').textContent = snippets[id];
+            document.getElementById('overlay').style.display = 'flex';
+        };
+
+        const hide = () => {
+            document.getElementById('overlay').style.display = 'none';
+        };
+
+        window.onkeydown = (e) => { if(e.key === "Escape") hide(); };
+    </script>
 </body>
 </html>
